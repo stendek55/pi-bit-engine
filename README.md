@@ -2,6 +2,8 @@
 
 **Computing π from the ground up using bitwise operations in Rust.**
 
+![PI](assets/pi-bit-engine-matrix.png)
+
 A low-level Rust project exploring how mathematical computation can be built from fundamental bit operations — without relying on conventional arithmetic as the computational foundation.
 
 ## Vision
