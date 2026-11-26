@@ -8,5 +8,8 @@ fn main() {
 
     let result = byte.set_bit(3);
 
-    println!("Result: {:08b}", result.value());
+    println!(
+        "Result: {:08b}",
+        result.expect("set_bit should succeed").value()
+    );
 }
