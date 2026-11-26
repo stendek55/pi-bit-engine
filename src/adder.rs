@@ -32,7 +32,27 @@ pub struct BitAdder8Result {
 }
 
 pub fn bit_adder_8(a: u8, b: u8) -> BitAdder8Result {
-    todo!("Implement 8-bit adder using full adder")
+    let a_byte = BitByte::new(a);
+    let b_byte = BitByte::new(b);
+
+    let mut sum = BitByte::new(0);
+    let mut carry = false;
+
+    for index in 0..8 {
+        let a_bit = a_byte.check_bit(index).expect("index must be valid");
+
+        let b_bit = b_byte.check_bit(index).expect("index must be valid");
+
+        let result = full_adder(a_bit, b_bit, carry);
+
+        if result.sum {
+            sum = sum.set_bit(index).expect("index must be valid");
+        }
+
+        carry = result.carry;
+    }
+
+    BitAdder8Result { sum, carry }
 }
 
 #[cfg(test)]
