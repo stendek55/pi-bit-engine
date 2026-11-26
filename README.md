@@ -38,3 +38,11 @@ Every operation is built, tested and understood at the bit level.
 
 **π is the goal. Bits are the foundation.**
 
+
+## Core Requirement
+
+π must be computed digit by digit, sequentially, with no predefined precision limit.
+
+The engine must determine each next digit, verify that it is mathematically certain, output it, and continue from its current state — without recalculating previous digits or computing a fixed number of digits in advance.
+
+The goal is an indefinitely running digit generator, limited only by available computational resources.
