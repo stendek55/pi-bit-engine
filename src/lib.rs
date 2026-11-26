@@ -9,6 +9,12 @@ impl BitIndexError {
     }
 }
 
+impl std::fmt::Display for BitIndexError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "bit index {} is out of range (valid: 0..=7)", self.index)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitByte(pub u8);
 
@@ -320,5 +326,15 @@ mod tests {
     fn test_check_bit_invalid_index() {
         assert!(BitByte::new(0).check_bit(8).is_err());
         assert!(BitByte::new(0).check_bit(255).is_err());
+    }
+
+    #[test]
+    fn test_bit_index_error_display() {
+        let error = BitIndexError::new(8);
+
+        assert_eq!(
+            error.to_string(),
+            "bit index 8 is out of range (valid: 0..=7)"
+        );
     }
 }
