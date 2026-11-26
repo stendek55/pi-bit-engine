@@ -38,14 +38,24 @@ impl BitByte {
 
     /// Schiebt alle Bits um X Positionen nach links.
     /// Rechts wird mit Nullen aufgefüllt. Bits, die links herausfallen, gehen verloren.
+    /// Bei einer Verschiebung >= 8 werden alle Bits entfernt.
     pub fn shift_left(&self, positions: u8) -> Self {
-        BitByte(self.0 << positions)
+        if positions >= 8 {
+            BitByte(0)
+        } else {
+            BitByte(self.0 << positions)
+        }
     }
 
     /// Schiebt alle Bits um X Positionen nach rechts.
     /// Links wird mit Nullen aufgefüllt. Bits, die rechts herausfallen, gehen verloren.
+    /// Bei einer Verschiebung >= 8 werden alle Bits entfernt.
     pub fn shift_right(&self, positions: u8) -> Self {
-        BitByte(self.0 >> positions)
+        if positions >= 8 {
+            BitByte(0)
+        } else {
+            BitByte(self.0 >> positions)
+        }
     }
 
     /// Setzt das Bit am angegebenen Index (0-7) garantiert auf 1.
@@ -225,5 +235,19 @@ mod tests {
         assert!(result.check_bit(3));
         assert!(result.check_bit(4));
         assert!(!result.check_bit(0));
+    }
+
+    #[test]
+    fn test_shift_left_out_of_range() {
+        assert_eq!(BitByte::new(0xFF).shift_left(8), BitByte::new(0));
+        assert_eq!(BitByte::new(0xFF).shift_left(9), BitByte::new(0));
+        assert_eq!(BitByte::new(0xFF).shift_left(255), BitByte::new(0));
+    }
+
+    #[test]
+    fn test_shift_right_out_of_range() {
+        assert_eq!(BitByte::new(0xFF).shift_right(8), BitByte::new(0));
+        assert_eq!(BitByte::new(0xFF).shift_right(9), BitByte::new(0));
+        assert_eq!(BitByte::new(0xFF).shift_right(255), BitByte::new(0));
     }
 }
