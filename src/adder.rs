@@ -25,6 +25,16 @@ pub fn full_adder(a: bool, b: bool, carry_in: bool) -> AdderResult {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BitAdder8Result {
+    pub sum: BitByte,
+    pub carry: bool,
+}
+
+pub fn bit_adder_8(a: u8, b: u8) -> BitAdder8Result {
+    todo!("Implement 8-bit adder using full adder")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -69,6 +79,56 @@ mod tests {
                     assert_eq!(result.sum, reference & 1 == 1);
                     assert_eq!(result.carry, reference >= 2);
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn bit_adder_8_zero() {
+        let result = bit_adder_8(0, 0);
+
+        assert_eq!(result.sum.value(), 0);
+        assert!(!result.carry);
+    }
+
+    #[test]
+    fn bit_adder_8_simple() {
+        let result = bit_adder_8(5, 3);
+
+        assert_eq!(result.sum.value(), 8);
+        assert!(!result.carry);
+    }
+
+    #[test]
+    fn bit_adder_8_carry() {
+        let result = bit_adder_8(255, 1);
+
+        assert_eq!(result.sum.value(), 0);
+        assert!(result.carry);
+    }
+
+    #[test]
+    fn bit_adder_8_overflow_boundary() {
+        let result = bit_adder_8(200, 100);
+
+        assert_eq!(result.sum.value(), 44);
+        assert!(result.carry);
+    }
+
+    #[test]
+    fn bit_adder_8_exhaustive() {
+        for a in 0u8..=255 {
+            for b in 0u8..=255 {
+                let result = bit_adder_8(a, b);
+                let reference = u16::from(a) + u16::from(b);
+
+                assert_eq!(
+                    result.sum.value(),
+                    reference as u8,
+                    "sum mismatch: {a} + {b}"
+                );
+
+                assert_eq!(result.carry, reference > 255, "carry mismatch: {a} + {b}");
             }
         }
     }
