@@ -1,3 +1,5 @@
+pub mod adder;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitIndexError {
     pub index: u8,
