@@ -1,4 +1,5 @@
 pub mod adder;
+pub mod subber;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitIndexError {
