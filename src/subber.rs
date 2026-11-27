@@ -123,5 +123,64 @@ mod tests {
         assert_eq!(result.difference.value(), 0);
         assert!(!result.borrow);
     }
+
+    #[test]
+    fn subtract_exhaustive_all_8bit_values() {
+        // Alle 256 × 256 möglichen Kombinationen testen.
+        for a in 0u16..=255 {
+            for b in 0u16..=255 {
+                let result = BitSubtractor8::subtract(a as u8, b as u8);
+
+                // Referenzberechnung außerhalb unserer Bit-Engine
+                let expected_difference = a.wrapping_sub(b) as u8;
+                let expected_borrow = a < b;
+
+                assert_eq!(
+                    result.difference.value(),
+                    expected_difference,
+                    "Difference falsch bei a={a}, b={b}"
+                );
+
+                assert_eq!(
+                    result.borrow, expected_borrow,
+                    "Borrow falsch bei a={a}, b={b}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn full_subber_exhaustive_truth_table() {
+        // Alle 8 möglichen Kombinationen aus:
+        // a_bit, b_bit und borrow_in.
+        //
+        // Format:
+        // (a_bit, b_bit, borrow_in, expected_difference, expected_borrow_out)
+
+        let test_cases = [
+            (false, false, false, false, false),
+            (false, false, true, true, true),
+            (false, true, false, true, true),
+            (false, true, true, false, true),
+            (true, false, false, true, false),
+            (true, false, true, false, false),
+            (true, true, false, false, false),
+            (true, true, true, true, true),
+        ];
+
+        for (a_bit, b_bit, borrow_in, expected_difference, expected_borrow_out) in test_cases {
+            let (difference, borrow_out) = full_subber(a_bit, b_bit, borrow_in);
+
+            assert_eq!(
+                difference, expected_difference,
+                "Difference falsch bei a={a_bit}, b={b_bit}, borrow_in={borrow_in}"
+            );
+
+            assert_eq!(
+                borrow_out, expected_borrow_out,
+                "Borrow falsch bei a={a_bit}, b={b_bit}, borrow_in={borrow_in}"
+            );
+        }
+    }
 }
 
