@@ -19,6 +19,10 @@ impl BitComparator8 {
         }
         ComparisonResult::Equal
     }
+
+    pub fn compare_bits(_a: u8, _b: u8) -> ComparisonResult {
+        unimplemented!("bit-based comparator is not implemented yet")
+    }
 }
 
 #[cfg(test)]
@@ -226,6 +230,191 @@ mod tests {
 
         // Act:
         let result = BitComparator8::compare(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Greater);
+    }
+
+    // ============================================================
+    // BIT-BASED COMPARATOR TESTS
+    // ============================================================
+
+    // ------------------------------------------------------------
+    // TEST 13: A ist kleiner als B
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_when_a_is_less_than_b() {
+        // Arrange:
+        // A = 0000 0101 = 5
+        // B = 0000 1010 = 10
+        //
+        // Das höchstwertige unterschiedliche Bit entscheidet zugunsten B.
+        let a: u8 = 5;
+        let b: u8 = 10;
+
+        // Act:
+        // Der bitbasierte Comparator soll die Bits selbst auswerten.
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        // A ist kleiner als B.
+        assert_eq!(result, ComparisonResult::Less);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 14: A ist größer als B
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_when_a_is_greater_than_b() {
+        // Arrange:
+        // A = 0000 1010 = 10
+        // B = 0000 0101 = 5
+        let a: u8 = 10;
+        let b: u8 = 5;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Greater);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 15: Identische Zahlen ergeben Equal
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_when_values_are_equal() {
+        // Arrange:
+        // Beide Werte besitzen exakt dasselbe Bitmuster.
+        let a: u8 = 42;
+        let b: u8 = 42;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        // Kein Bit unterscheidet sich.
+        assert_eq!(result, ComparisonResult::Equal);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 16: Null ist kleiner als 255
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_zero_with_max_value() {
+        // Arrange:
+        // A = 0000 0000
+        // B = 1111 1111
+        let a: u8 = 0;
+        let b: u8 = u8::MAX;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Less);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 17: 255 ist größer als Null
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_max_value_with_zero() {
+        // Arrange:
+        // A = 1111 1111
+        // B = 0000 0000
+        let a: u8 = u8::MAX;
+        let b: u8 = 0;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Greater);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 18: Das höchstwertige Bit entscheidet
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_msb_decides_result() {
+        // Arrange:
+        // A = 1000 0000 = 128
+        // B = 0111 1111 = 127
+        //
+        // Bit 7 unterscheidet sich bereits:
+        // A besitzt dort eine 1, B eine 0.
+        //
+        // Alle weiteren Bits dürfen das Ergebnis nicht verändern.
+        let a: u8 = 0b1000_0000;
+        let b: u8 = 0b0111_1111;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Greater);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 19: Das niedrigstwertige Bit entscheidet
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_lsb_decides_result() {
+        // Arrange:
+        // A = 0000 0001 = 1
+        // B = 0000 0000 = 0
+        //
+        // Die Bits 7 bis 1 sind identisch.
+        // Erst Bit 0 liefert den entscheidenden Unterschied.
+        let a: u8 = 0b0000_0001;
+        let b: u8 = 0b0000_0000;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Greater);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 20: Identisches komplexes Bitmuster
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_identical_complex_pattern() {
+        // Arrange:
+        // Beide Zahlen enthalten mehrere gesetzte und nicht gesetzte Bits.
+        // Dadurch testen wir, dass der Comparator bei Gleichheit
+        // sämtliche Bitpositionen korrekt behandelt.
+        let a: u8 = 0b1010_1101;
+        let b: u8 = 0b1010_1101;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
+
+        // Assert:
+        assert_eq!(result, ComparisonResult::Equal);
+    }
+
+    // ------------------------------------------------------------
+    // TEST 21: Erstes unterschiedliches Bit entscheidet
+    // ------------------------------------------------------------
+    #[test]
+    fn test_compare_bits_first_difference_decides() {
+        // Arrange:
+        // A = 1010 0000
+        // B = 1001 1111
+        //
+        // Bit 7: beide 1 -> weiter
+        // Bit 6: beide 0 -> weiter
+        // Bit 5: A = 1, B = 0 -> A ist größer
+        //
+        // Die nachfolgenden Bits dürfen das Ergebnis nicht ändern.
+        let a: u8 = 0b1010_0000;
+        let b: u8 = 0b1001_1111;
+
+        // Act:
+        let result = BitComparator8::compare_bits(a, b);
 
         // Assert:
         assert_eq!(result, ComparisonResult::Greater);
