@@ -441,4 +441,36 @@ mod tests {
         // Assert:
         assert_eq!(result, ComparisonResult::Greater);
     }
+
+    // ============================================================
+    // TEST 22: Exhaustiver bitweiser Vergleich aller u8-Kombinationen
+    // ============================================================
+    #[test]
+    fn test_compare_bits_exhaustive_all_u8_combinations() {
+        // Arrange:
+        // Der u8-Wertebereich reicht von 0 bis einschließlich 255.
+        //
+        // Wir wollen jede mögliche Kombination von a und b testen.
+        // 256 Werte für a * 256 Werte für b = 65.536 Kombinationen.
+
+        // Act & Assert:
+        // Die äußere Schleife durchläuft sämtliche möglichen Werte von a.
+        for a in 0u8..=u8::MAX {
+            // Die innere Schleife durchläuft für jedes a
+            // sämtliche möglichen Werte von b.
+            for b in 0u8..=u8::MAX {
+                // Unsere bitweise Implementierung ist das zu prüfende System.
+                let bit_result = BitComparator8::compare_bits(a, b);
+
+                // Unsere native Vergleichsmethode dient als Referenz.
+                let reference_result = BitComparator8::compare(a, b);
+
+                // Beide Ergebnisse müssen bei jeder Kombination identisch sein.
+                assert_eq!(
+                    bit_result, reference_result,
+                    "Mismatch for a = {a} ({a:08b}), b = {b} ({b:08b})"
+                );
+            }
+        }
+    }
 }
