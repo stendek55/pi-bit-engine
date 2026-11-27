@@ -1,3 +1,5 @@
+use crate::BitByte;
+
 // ============================================================
 // Comparator – 8-Bit Vergleich
 // ============================================================
@@ -20,8 +22,28 @@ impl BitComparator8 {
         ComparisonResult::Equal
     }
 
-    pub fn compare_bits(_a: u8, _b: u8) -> ComparisonResult {
-        unimplemented!("bit-based comparator is not implemented yet")
+    pub fn compare_bits(a: u8, b: u8) -> ComparisonResult {
+        let a_byte = BitByte::new(a);
+        let b_byte = BitByte::new(b);
+
+        for i in (0..=7).rev() {
+            let a_bit = a_byte.check_bit(i).expect("valid bit index");
+            let b_bit = b_byte.check_bit(i).expect("valid bit index");
+
+            if a_bit == b_bit {
+                continue;
+            }
+
+            if !a_bit && b_bit {
+                return ComparisonResult::Less;
+            }
+
+            if a_bit && !b_bit {
+                return ComparisonResult::Greater;
+            }
+        }
+
+        ComparisonResult::Equal
     }
 }
 
