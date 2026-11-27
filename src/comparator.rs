@@ -11,8 +11,13 @@ pub enum ComparisonResult {
 pub struct BitComparator8;
 
 impl BitComparator8 {
-    pub fn compare(_a: u8, _b: u8) -> ComparisonResult {
-        unimplemented!("8-bit comparator is not implemented yet")
+    pub fn compare(a: u8, b: u8) -> ComparisonResult {
+        if a < b {
+            return ComparisonResult::Less;
+        } else if a > b {
+            return ComparisonResult::Greater;
+        }
+        ComparisonResult::Equal
     }
 }
 
