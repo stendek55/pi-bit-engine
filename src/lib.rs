@@ -1,4 +1,5 @@
 pub mod adder;
+pub mod comparator;
 pub mod subber;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
