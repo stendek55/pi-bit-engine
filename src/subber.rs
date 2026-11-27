@@ -1,15 +1,61 @@
 use crate::BitByte;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitSubtractor8Result {
     pub difference: BitByte,
     pub borrow: bool,
 }
 
-pub struct BitSubtractor8 {}
+pub struct BitSubtractor8;
+
+// --------------------------------------------------
+// 1-Bit Full Subtractor
+// --------------------------------------------------
+
+pub fn full_subber(a_bit: bool, b_bit: bool, borrow_in: bool) -> (bool, bool) {
+    // Difference berechnen
+    let partial_difference = a_bit ^ b_bit;
+    let difference_bit = partial_difference ^ borrow_in;
+    // Borrow aus A und B
+    let borrow_due_to_ab = !a_bit && b_bit;
+    // Borrow aus dem eingehenden Borrow
+    let borrow_due_to_input = !partial_difference && borrow_in;
+    // Beide Borrow-Ursachen zusammenführen
+    let borrow_out = borrow_due_to_ab || borrow_due_to_input;
+
+    (difference_bit, borrow_out)
+}
+
+// --------------------------------------------------
+// 8-Bit Subtractor mit Borrow Chain
+// --------------------------------------------------
 
 impl BitSubtractor8 {
     pub fn subtract(a: u8, b: u8) -> BitSubtractor8Result {
-        unimplemented!();
+        let a_byte = BitByte::new(a);
+        let b_byte = BitByte::new(b);
+
+        let mut difference = BitByte::new(0);
+        let mut borrow = false;
+
+        // Vom niederwertigsten zum höchstwertigen Bit
+        for index in 0..8 {
+            let a_bit = a_byte.check_bit(index).expect("index muss valide sein!");
+            let b_bit = b_byte.check_bit(index).expect("index muss valide sein!");
+
+            // 1-Bit Subtraktion
+            let (difference_bit, borrow_out) = full_subber(a_bit, b_bit, borrow);
+
+            // Ergebnisbit in das Ergebnisbyte übernehmen
+            if difference_bit {
+                difference = difference.set_bit(index).expect("index muss valide sein!");
+            }
+
+            // Borrow an die nächste Bitposition weiterreichen
+            borrow = borrow_out;
+        }
+
+        BitSubtractor8Result { difference, borrow }
     }
 }
 
